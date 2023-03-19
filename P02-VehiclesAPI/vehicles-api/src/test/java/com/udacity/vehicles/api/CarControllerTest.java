@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,6 +22,7 @@ import com.udacity.vehicles.domain.car.Details;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.service.CarService;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,6 +100,13 @@ public class CarControllerTest {
          *   below (the vehicle will be the first in the list).
          */
 
+        MediaType contentType = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
+
+
+        mvc.perform(get(new URI("/cars"))).andExpect(status().isOk()).andExpect(content().contentType(contentType));
+
+        verify(carService, times(1)).list();
+
     }
 
     /**
@@ -109,6 +119,12 @@ public class CarControllerTest {
          * TODO: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
+
+        mvc.perform(get(new URI("/cars/1"))).andExpect(status().isOk());
+
+        verify(carService, times(1)).findById(1L);
+
+
     }
 
     /**
@@ -122,6 +138,10 @@ public class CarControllerTest {
          *   when the `delete` method is called from the Car Controller. This
          *   should utilize the car from `getCar()` below.
          */
+
+        mvc.perform(delete(new URI("/cars/1"))).andExpect(status().isNoContent());
+
+        verify(carService, times(1)).delete(1L);
     }
 
     /**
